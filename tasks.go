@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"flag"
 	"time"
 	"fmt"
 	"os"
@@ -10,7 +11,19 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) > 0 && len(args) <= 2 {
-		if args[0] == 
+		switch {
+		case args[0] == "list":
+			fmt.Println(list())
+		
+		case args[0] == "add":
+			add(args[1])
+		
+		case args[0] == "delete":
+			delete(args[1])
+
+		default:
+			fmt.Println("argument is not recoginzed")
+		}
 	}
 
 	fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
