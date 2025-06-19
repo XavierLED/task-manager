@@ -8,16 +8,16 @@ import (
 	"encoding/csv"
 )
 
-filepath := "tasks.csv"
+var filepath string = "tasks.csv"
 
 func main() {
 	args := os.Args[1:]
-	wholeList := flag.Bool("a", false, "a flag that will list all tasks completed and uncompleted")
+	listWhole := flag.Bool("a", false, "a flag that will list all tasks completed and uncompleted")
 
 	if len(args) > 0 && len(args) <= 2 {
 		switch {
 		case args[0] == "list":
-			fmt.Println(list())
+			list()
 		
 		case args[0] == "add":
 			add(args[1])
@@ -30,10 +30,8 @@ func main() {
 		default:
 			fmt.Println("The argument used is unknown\n Proper use: ./tasks $argument $task/nothing")
 		}
-	}
-
-	else if *wholeList {
-		fmt.Println(wholeList())
+	} else if (*listWhole) {
+		wholeList()
 	}
 
 	fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
@@ -43,25 +41,36 @@ func wholeList() {
 
 }
 
-func list() string{
+func list() {
 	allTasks := loader()
 
-	for i, allTasks {//i dont think this is how you do enumeration in go lang
+	for _, i := range allTasks {//i dont think this is how you do enumeration in go lang
 		fmt.Println(i)
 	}
 }
 
 func add(task string) {
-	currentTime := time.Now()	update := {task, time.Now, "false"}
+	currentTime := time.Now()
+	update := []string {task, currentTime.String(), "false"}
 
-	file, err := os.OpenFile(filepath, os.O_WRONGLY|os.O_APPEND, 0664)
+	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, 0664)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	
+	err = writer.Write(update)
 	if err != nil {
 		panic(err)
 	}
 
-	writer := csv.NewWriter(file)
-	writer.Write(update)
-	writer.FLush()
+	writer.Flush()
+
+	if err := writer.Error; err != nil {
+		panic(err)
+	}
 }
 
 func delete(task string) {
@@ -72,8 +81,8 @@ func complete(task string) int{
 	allTasks := loader()
 	//possibly split the string
 
-	for i, allTasks {
-		if allTasks[i][0] == task {
+	for _, i := range allTasks {
+		if (allTasks[i][0] == task) {
 			allTasks[i][2] = true
 			return 0
 		}
@@ -84,15 +93,19 @@ func complete(task string) int{
 
 }
 
-func loader() string[][] {
+func loader() [][]string {
 	file, err := os.Open(filepath)
 
 	if err != nil {
 		panic(err)
+		file.Close()
 	}
 
 	reader := csv.NewReader(file)
-	allTasks := reader.ReadAll(file)
+	allTasks, err := reader.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
 
 	return allTasks
 }
