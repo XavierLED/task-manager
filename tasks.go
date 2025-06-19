@@ -9,6 +9,7 @@ import (
 
 func main() {
 	args := os.Args[1:]
+	wholeList := flag.Bool("a", false, "a flag that will list all tasks completed and uncompleted")
 
 	if len(args) > 0 && len(args) <= 2 {
 		switch {
@@ -26,7 +27,15 @@ func main() {
 		}
 	}
 
+	else if *wholeList {
+		fmt.Println(wholeList())
+	}
+
 	fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
+}
+
+func wholeList() {
+
 }
 
 func list() string{
@@ -34,7 +43,7 @@ func list() string{
 }
 
 func add(task string) {
-
+	currentTime := time.Now()
 }
 
 func delete(task string) {
