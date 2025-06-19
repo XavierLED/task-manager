@@ -81,9 +81,9 @@ func complete(task string) int{
 	allTasks := loader()
 	//possibly split the string
 
-	for _, i := range allTasks {
+	for i := 0; i < len(allTasks); i++ {
 		if (allTasks[i][0] == task) {
-			allTasks[i][2] = true
+			allTasks[i][2] = "true"
 			return 0
 		}
 	}
@@ -102,7 +102,7 @@ func loader() [][]string {
 	}
 
 	reader := csv.NewReader(file)
-	allTasks, err := reader.ReadAll(file)
+	allTasks, err := reader.ReadAll()
 	if err != nil {
 		panic(err)
 	}
