@@ -1,4 +1,4 @@
-package todo
+package main
 
 import (
 	"flag"
@@ -37,9 +37,15 @@ func main() {
 	fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
 }
 
+
+
+
 func wholeList() {
 
 }
+
+
+
 
 func list() {
 	allTasks := loader()
@@ -48,6 +54,9 @@ func list() {
 		fmt.Println(i)
 	}
 }
+
+
+
 
 func add(task string) {
 	currentTime := time.Now()
@@ -73,9 +82,15 @@ func add(task string) {
 	}
 }
 
+
+
+
 func delete(task string) {
 
 }
+
+
+
 
 func complete(task string) int{
 	allTasks := loader()
@@ -92,6 +107,9 @@ func complete(task string) int{
 	return 1
 
 }
+
+
+
 
 func loader() [][]string {
 	file, err := os.Open(filepath)
