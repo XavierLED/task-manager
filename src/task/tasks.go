@@ -9,8 +9,10 @@ import (
 )
 
 var filepath string = "tasks.csv"
+var allTasks := []string[]{}
 
 func main() {
+	loader()
 	args := os.Args[1:]
 	listWhole := flag.Bool("a", false, "a flag that will list all tasks completed and uncompleted")
 
@@ -48,8 +50,6 @@ func wholeList() {
 
 
 func list() {
-	allTasks := loader()
-
 	for _, i := range allTasks {//i dont think this is how you do enumeration in go lang
 		fmt.Println(i)
 	}
@@ -62,6 +62,60 @@ func add(task string) {
 	currentTime := time.Now()
 	update := []string {task, currentTime.String(), "false"}
 
+	allTasks = append(allTasks, update)
+}
+
+
+
+
+func delete(task string) {
+
+	writer()
+}
+
+
+
+
+func complete(task string) int{
+	//possibly split the string
+
+	for i := 0; i < len(allTasks); i++ {
+		if (allTasks[i][0] == task) {
+			allTasks[i][2] = "true"
+			return 0
+		}
+	}
+
+	writer()
+
+	fmt.Println("Task does not exist and therefore cannot be completed")
+	return 1
+}
+
+
+
+
+func loader() {
+	file, err := os.Open(filepath)
+
+	if err != nil {
+		panic(err)
+		file.Close()
+	}
+
+	reader := csv.NewReader(file)
+	tempTasks, err := reader.ReadAll()
+	file.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	allTasks = append(allTasks, tempTasks)
+}
+
+
+
+func writer() {
 	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, 0664)
 	if err != nil {
 		panic(err)
@@ -80,50 +134,4 @@ func add(task string) {
 	if err := writer.Error; err != nil {
 		panic(err)
 	}
-}
-
-
-
-
-func delete(task string) {
-
-}
-
-
-
-
-func complete(task string) int{
-	allTasks := loader()
-	//possibly split the string
-
-	for i := 0; i < len(allTasks); i++ {
-		if (allTasks[i][0] == task) {
-			allTasks[i][2] = "true"
-			return 0
-		}
-	}
-
-	fmt.Println("Task does not exist and therefore cannot be completed")
-	return 1
-
-}
-
-
-
-
-func loader() [][]string {
-	file, err := os.Open(filepath)
-
-	if err != nil {
-		panic(err)
-		file.Close()
-	}
-
-	reader := csv.NewReader(file)
-	allTasks, err := reader.ReadAll()
-	if err != nil {
-		panic(err)
-	}
-
-	return allTasks
 }
