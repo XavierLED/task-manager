@@ -5,7 +5,9 @@ import (
 	"time"
 	"fmt"
 	"os"
+	"text/tabwriter"
 	"encoding/csv"
+	"github.com/mergestat/timediff"
 )
 
 var filepath string = "tasks.csv"
@@ -29,10 +31,12 @@ func main() {
 
 			case args[0] == "complete":
 				complete(args[1])
+			case args[0] == "-a":
+				wholeList()
 			default:
 				fmt.Println("The argument used is unknown\n Proper use: ./tasks $argument $task/nothing")
 		}
-	} else if (*listWhole) {
+	}else if (*listWhole) {
 		wholeList()
 	} else{
 		fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
@@ -43,16 +47,34 @@ func main() {
 
 
 func wholeList() {
+		w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 
+	fmt.Fprintln(w, "ID\tDescription\tTime\tCompletion")
+	for j, i := range allTasks {//i dont think this is how you do enumeration in go lang
+		date, _ := time.Parse(time.RFC1123, i[1])
+		fmt.Fprintf(w, "%d\t%s\t%s\t%s\n",j,i[0],timediff.TimeDiff(date),i[2])
+		
+	}
+	w.Flush()
 }
 
 
 
 
 func list() {
-	for _, i := range allTasks {//i dont think this is how you do enumeration in go lang
-		fmt.Printf("%s\t%s\t%s\n",i[0],i[1],i[2])
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+
+	fmt.Fprintln(w, "ID\tDescription\tTime\tCompletion")
+	for j, i := range allTasks {//i dont think this is how you do enumeration in go lang
+		if i[2] == "false" {
+			date, _ := time.Parse(time.RFC1123, i[1])
+			fmt.Fprintf(w, "%d\t%s\t%s\t%s\n",j,i[0],timediff.TimeDiff(date),i[2])
+		
+		}
 	}
+	w.Flush()
 }
 
 
@@ -60,7 +82,7 @@ func list() {
 
 func add(task string) {
 	currentTime := time.Now()
-	update := []string {task, currentTime.String(), "false"}
+	update := []string {task, currentTime.Format(time.RFC1123), "false"}
 
 	allTasks = append(allTasks, update)
 	writer()
@@ -92,11 +114,10 @@ func complete(task string) int{
 	for i := 0; i < len(allTasks); i++ {
 		if (allTasks[i][0] == task) {
 			allTasks[i][2] = "true"
+			writer()
 			return 0
 		}
 	}
-
-	writer()
 
 	fmt.Println("Task does not exist and therefore cannot be completed")
 	return 1
