@@ -9,7 +9,7 @@ import (
 )
 
 var filepath string = "tasks.csv"
-var allTasks := []string[]{}
+var allTasks [][]string
 
 func main() {
 	loader()
@@ -18,25 +18,25 @@ func main() {
 
 	if len(args) > 0 && len(args) <= 2 {
 		switch {
-		case args[0] == "list":
-			list()
-		
-		case args[0] == "add":
-			add(args[1])
-		
-		case args[0] == "delete":
-			delete(args[1])
+			case args[0] == "list":
+				list()
+			
+			case args[0] == "add":
+				add(args[1])
+			
+			case args[0] == "delete":
+				delete(args[1])
 
-		case args[0] == "complete":
-			complete(args[1])
-		default:
-			fmt.Println("The argument used is unknown\n Proper use: ./tasks $argument $task/nothing")
+			case args[0] == "complete":
+				complete(args[1])
+			default:
+				fmt.Println("The argument used is unknown\n Proper use: ./tasks $argument $task/nothing")
 		}
 	} else if (*listWhole) {
 		wholeList()
+	} else{
+		fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
 	}
-
-	fmt.Println("The correct usage is: go run . $argument/flag $task/nothing")
 }
 
 
@@ -51,7 +51,7 @@ func wholeList() {
 
 func list() {
 	for _, i := range allTasks {//i dont think this is how you do enumeration in go lang
-		fmt.Println(i)
+		fmt.Printf("%s\t%s\t%s\n",i[0],i[1],i[2])
 	}
 }
 
@@ -63,12 +63,22 @@ func add(task string) {
 	update := []string {task, currentTime.String(), "false"}
 
 	allTasks = append(allTasks, update)
+	writer()
 }
 
 
 
 
-func delete(task string) {
+func delete(delTask string) {
+	newlength := 0
+	for _, task := range allTasks {
+		if task[0] != delTask {
+			allTasks[newlength] = task 
+			newlength++
+		}
+	}
+	allTasks = allTasks[:newlength]
+
 
 	writer()
 }
@@ -100,7 +110,6 @@ func loader() {
 
 	if err != nil {
 		panic(err)
-		file.Close()
 	}
 
 	reader := csv.NewReader(file)
@@ -110,13 +119,13 @@ func loader() {
 		panic(err)
 	}
 
-	allTasks = append(allTasks, tempTasks)
+	allTasks = tempTasks
 }
 
 
 
 func writer() {
-	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY, 0664)
+	file, err := os.Create(filepath)
 	if err != nil {
 		panic(err)
 	}
@@ -124,14 +133,13 @@ func writer() {
 
 	writer := csv.NewWriter(file)
 	
-	err = writer.Write(update)
+	for _, task := range allTasks{
+		err = writer.Write(task)
+	}
+
 	if err != nil {
 		panic(err)
 	}
 
 	writer.Flush()
-
-	if err := writer.Error; err != nil {
-		panic(err)
-	}
 }
