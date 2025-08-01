@@ -16,4 +16,5 @@ Used to list all tasks that are not completed. Use: go run . list
 # -a
 Used to list all tasks, completed or not. Use: go run . -a
 
+# Conclude
 This is my first go project, I hope you like it, it was fun to build.
